@@ -3,3 +3,5 @@ dist/
 .secrets/
 *.key
 .DS_Store
+supabase/.temp/
+.env
