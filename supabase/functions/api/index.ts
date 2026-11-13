@@ -78,7 +78,7 @@ async function verifyGoogleToken(idToken: string): Promise<User> {
 async function identify(req: Request): Promise<User> {
   const idToken = req.headers.get("x-google-id-token");
   if (idToken) return verifyGoogleToken(idToken);
-  // Admin access key (for maintenance scripts). None are issued to the app.
+  // Personal access key (interim sign-in before Google is set up, or maintenance scripts)
   const key = req.headers.get("x-cool-key") ?? "";
   if (key.length >= 20) {
     const { data } = await db.from("app_keys").select("label, email, name, is_admin").eq("key_hash", await sha256(key)).maybeSingle();
