@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' data: blob:; font-src 'self' data:;" />
+  <title>COOL Code</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="titlebar">
+    <span class="brand">COOL Code</span>
+    <nav class="tabs">
+      <button data-view="design" class="on">Design</button>
+      <button data-view="scans">Scans</button>
+    </nav>
+    <div class="title-right">
+    <button id="updateBtn" class="update-pill" hidden></button>
+    <div id="userChip" class="user-chip" hidden>
+      <button id="userBtn" class="user-btn" aria-haspopup="menu"><span id="userAvatar" class="avatar"></span><span id="userName"></span></button>
+      <div id="userMenu" class="user-menu" role="menu" hidden>
+        <div class="um-head"><b id="umName"></b><span id="umEmail"></span><em id="umRole" hidden>Admin</em></div>
+        <button id="btnSignOut" role="menuitem">Sign out</button>
+      </div>
+    </div>
+    <button id="btnSignInTop" class="btn-ghost sm" hidden>Sign in</button>
+    <button id="btnSettings" class="icon-btn" title="Tracking settings" aria-label="Tracking settings">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+    </button>
+    </div>
+  </div>
+
+  <!-- ===================== SIGN IN ===================== -->
+  <div id="signin" class="signin" hidden>
+    <div class="signin-card">
+      <img src="icon.png" alt="" class="signin-logo" />
+      <h1>COOL Code</h1>
+      <p>Sign in with your <b id="signinDomain">Workspace</b> Google account to create tracked codes and see everyone’s scans.</p>
+      <button id="btnGoogle" class="btn-google">Sign in with Google</button>
+      <p id="googleSoon" class="signin-soon" hidden>Google sign-in is being set up by your admin. Use your access key until then.</p>
+      <button id="btnShowKey" class="link-btn">Have an access key?</button>
+      <form id="keyForm" class="key-form" hidden>
+        <input id="keyInput" type="password" placeholder="Paste your access key (cc_…)" autocomplete="off" spellcheck="false" />
+        <button type="submit" class="btn-primary">Sign in</button>
+      </form>
+      <p id="signinMsg" class="signin-msg"></p>
+      <button id="btnSkipSignin" class="link-btn muted">Continue without signing in — design only</button>
+    </div>
+  </div>
+
+  <div class="app view" id="view-design">
+    <!-- ===================== CONTROLS ===================== -->
+    <aside class="panel">
+      <section class="card">
+        <h2>Link</h2>
+        <input id="data" type="text" spellcheck="false" placeholder="https://your-link.com" value="https://example.com" />
+        <label class="switch-row">
+          <span><b>Track scans</b><small>Code points to a short tracking link that counts each scan, then forwards to your link.</small></span>
+          <input id="trackToggle" type="checkbox" class="switch" />
+        </label>
+        <div id="trackBox" class="track-box" hidden>
+          <div id="trackNew">
+            <input id="trackName" type="text" placeholder="Name this code (e.g. Spring flyer)" />
+            <button id="btnCreateTrack" class="btn-primary wide">Create tracking link</button>
+          </div>
+          <div id="trackActive" hidden>
+            <div class="track-pill">
+              <span class="live-dot"></span>
+              <span id="trackLabel" class="track-label"></span>
+              <button id="btnCopyShort" class="mini" title="Copy tracking link">Copy</button>
+            </div>
+            <p class="hint" id="trackHint">The code stays the same even if you change where it goes.</p>
+            <button id="btnUpdateDest" class="btn-primary wide" hidden>Update destination</button>
+            <div class="track-actions">
+              <button id="btnViewScans" class="link-btn">View scans →</button>
+              <button id="btnDetach" class="link-btn muted">New code</button>
+            </div>
+          </div>
+          <p id="trackError" class="error" hidden></p>
+        </div>
+        <p class="hint" id="linkHint">Any URL or text works. Shorter links make simpler, easier‑to‑scan codes.</p>
+      </section>
+
+      <section class="card">
+        <h2>Presets</h2>
+        <div id="presets" class="presets"></div>
+      </section>
+
+      <section class="card">
+        <h2>Overall shape</h2>
+        <div class="seg" data-bind="shape">
+          <button data-val="square" class="on">Square</button>
+          <button data-val="circle">Circle</button>
+        </div>
+        <label class="row">Background corner radius
+          <input id="bgRound" type="range" min="0" max="0.5" step="0.01" value="0" />
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Dots</h2>
+        <div id="dotStyles" class="chips"></div>
+        <div class="colorblock" data-target="dots"></div>
+      </section>
+
+      <section class="card">
+        <h2>Corner frames</h2>
+        <div id="cornerSquareStyles" class="chips small"></div>
+        <div class="colorblock" data-target="cornersSquare"></div>
+      </section>
+
+      <section class="card">
+        <h2>Corner centers</h2>
+        <div id="cornerDotStyles" class="chips small"></div>
+        <div class="colorblock" data-target="cornersDot"></div>
+      </section>
+
+      <section class="card">
+        <h2>Background</h2>
+        <label class="check"><input id="bgTransparent" type="checkbox" /> Transparent background</label>
+        <div class="colorblock" data-target="background"></div>
+      </section>
+
+      <section class="card">
+        <h2>Logo</h2>
+        <div id="drop" class="drop">
+          <img id="logoThumb" alt="" hidden />
+          <div id="dropText">Drop an image here or <u>choose a file</u><br /><small>PNG, JPG, SVG, WebP</small></div>
+          <input id="logoFile" type="file" accept="image/*" hidden />
+        </div>
+        <button id="logoRemove" class="link" hidden>Remove logo</button>
+        <div class="sublabel">My logos <small>— saved automatically, click to reuse</small></div>
+        <div id="logoLibrary" class="logo-library"><span class="empty-lib">Logos you add will appear here.</span></div>
+        <div class="sublabel">Logo backing</div>
+        <div class="seg mini" data-bind="logoBacking">
+          <button data-val="none" class="on">None</button>
+          <button data-val="circle">Circle</button>
+          <button data-val="rounded">Rounded</button>
+          <button data-val="square">Square</button>
+        </div>
+        <div class="colors" id="backingColorRow" hidden>
+          <label class="swatch"><input id="backingColor" type="color" value="#ffffff" /></label>
+          <span class="hint" style="margin:0">Backing color — helps logos with transparent edges stand out.</span>
+        </div>
+        <label class="row">Logo size <span id="logoSizeVal">35%</span>
+          <input id="logoSize" type="range" min="0.1" max="0.6" step="0.01" value="0.35" />
+        </label>
+        <label class="row">Logo padding <span id="logoMarginVal">6px</span>
+          <input id="logoMargin" type="range" min="0" max="30" step="1" value="6" />
+        </label>
+        <label class="check"><input id="hideDots" type="checkbox" checked /> Clear dots behind logo</label>
+      </section>
+
+      <section class="card">
+        <h2>Advanced</h2>
+        <label class="row">Error correction
+          <select id="ecl">
+            <option value="L">Low (7%)</option>
+            <option value="M">Medium (15%)</option>
+            <option value="Q">Quartile (25%)</option>
+            <option value="H" selected>High (30%) — best with logos</option>
+          </select>
+        </label>
+        <label class="row">Quiet zone (margin) <span id="marginVal">10px</span>
+          <input id="margin" type="range" min="0" max="60" step="1" value="10" />
+        </label>
+      </section>
+    </aside>
+
+    <!-- ===================== PREVIEW ===================== -->
+    <main class="stage">
+      <div class="preview-wrap">
+        <div id="preview" class="preview checker"></div>
+      </div>
+
+      <div id="scan" class="scan pending"><span class="dot"></span><span id="scanText">Checking…</span><button id="btnFix" class="fix-btn" hidden>Fix it</button></div>
+
+      <div class="export card">
+        <div class="export-row">
+          <label>Format
+            <select id="exportFormat">
+              <option value="png" selected>PNG</option>
+              <option value="png-clear">PNG — no background</option>
+              <option value="svg">SVG (vector)</option>
+              <option value="svg-clear">SVG — no background</option>
+              <option value="jpeg">JPEG</option>
+              <option value="webp">WebP</option>
+            </select>
+          </label>
+          <label id="sizeLabel">Size
+            <select id="exportSize">
+              <option value="1024">1024 px — web</option>
+              <option value="2048">2048 px — HD</option>
+              <option value="4096" selected>4096 px — print</option>
+              <option value="8192">8192 px — large print</option>
+              <option value="custom">Custom…</option>
+            </select>
+          </label>
+          <label id="customSizeLabel" hidden>Pixels
+            <input id="customSize" type="number" min="256" max="10000" step="1" value="3000" />
+          </label>
+          <button id="btnExport" class="primary">Export</button>
+          <button id="btnCopy">Copy image</button>
+        </div>
+        <p id="exportHint" class="export-hint"></p>
+        <div class="export-row sub">
+          <button id="btnSaveDesign" class="ghost">Save design…</button>
+          <button id="btnLoadDesign" class="ghost">Load design…</button>
+          <button id="btnRandom" class="ghost">Surprise me</button>
+          <button id="btnReset" class="ghost">Reset</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================== SCANS VIEW ===================== -->
+  <div class="view scans-view" id="view-scans" hidden>
+    <aside class="links-pane">
+      <div class="pane-head">
+        <h1>Tracked codes</h1>
+        <span style="flex:1"></span>
+        <button id="btnTeam" class="btn-ghost sm">Team</button>
+        <button id="btnRefresh" class="icon-btn" title="Refresh" aria-label="Refresh">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg>
+        </button>
+      </div>
+      <div id="overall" class="overall"></div>
+      <div class="list-tools">
+        <div class="seg mini" id="ownerFilter">
+          <button data-owner="all" class="on">Everyone</button>
+          <button data-owner="mine">Mine</button>
+        </div>
+        <input id="linkSearch" type="search" placeholder="Search codes or people" />
+      </div>
+      <div id="linkList" class="link-list"></div>
+    </aside>
+    <main id="linkDetail" class="link-detail">
+      <div class="empty-state">
+        <h2>Pick a code to see its scans</h2>
+        <p>Turn on <b>Track scans</b> in the Design tab to create your first tracked code.</p>
+      </div>
+    </main>
+    <div id="chartTip" class="chart-tip" hidden></div>
+  </div>
+
+  <!-- ===================== SETTINGS ===================== -->
+  <div id="settingsModal" class="modal" hidden>
+    <div class="modal-card">
+      <h2>Scan tracking</h2>
+      <p class="hint">COOL Code counts scans through your own tracking service. This is filled in for you — only change it if the service moves.</p>
+      <label class="row">Service URL
+        <input id="setUrl" type="text" spellcheck="false" placeholder="https://xxxx.supabase.co/functions/v1" />
+      </label>
+      <p id="setStatus" class="hint"></p>
+      <div class="about-row"><span>COOL Code <b id="appVersion"></b></span><button id="btnCheckUpdates" class="link-btn">Check for updates</button></div>
+      <div class="modal-actions">
+        <button id="setTest" class="btn-ghost">Test connection</button>
+        <span style="flex:1"></span>
+        <button id="setCancel" class="btn-ghost">Cancel</button>
+        <button id="setSave" class="btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="../node_modules/qr-code-styling/lib/qr-code-styling.js"></script>
+  <script src="../node_modules/jsqr/dist/jsQR.js"></script>
+  <script src="../node_modules/zxing-wasm/dist/iife/reader/index.js"></script>
+  <script src="app.js"></script>
+  <script src="tracking.js"></script>
+  <script src="auth.js"></script>
+  <script src="updates.js"></script>
+</body>
+</html>

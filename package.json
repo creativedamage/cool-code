@@ -1,0 +1,90 @@
+{
+  "name": "cool-code",
+  "version": "1.3.0",
+  "description": "COOL Code — custom QR code designer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:win": "electron-builder --win --publish never",
+    "release": "electron-builder --publish always"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jsqr": "^1.4.0",
+    "qr-code-styling": "^1.9.2",
+    "zxing-wasm": "^3.1.6"
+  },
+  "devDependencies": {
+    "electron": "^38.8.6",
+    "electron-builder": "^26.18.0"
+  },
+  "productName": "COOL Code",
+  "build": {
+    "appId": "com.waynegoodman.coolcode",
+    "productName": "COOL Code",
+    "copyright": "© 2026 Wayne Goodman",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "updater.js",
+      "renderer/**/*",
+      "package.json",
+      "tracking.defaults.json"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.graphics-design",
+      "artifactName": "COOL-Code-${version}-mac-${arch}.${ext}",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "title": "COOL Code",
+      "artifactName": "COOL-Code-${version}-${arch}.dmg"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "COOL-Code-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "COOL Code"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "build/icon.png",
+      "category": "Graphics",
+      "artifactName": "COOL-Code-${version}.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "creativedamage",
+      "repo": "cool-code",
+      "releaseType": "release"
+    }
+  },
+  "author": "Wayne Goodman",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/creativedamage/cool-code.git"
+  },
+  "homepage": "https://github.com/creativedamage/cool-code"
+}
